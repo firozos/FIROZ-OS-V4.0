@@ -15,7 +15,7 @@ jobs:
       - name: Install Build Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld unzip wget make xxd
+          sudo apt-get install -y clang lld unzip wget make xxd binutils
 
       - name: Download and Setup PS5 Payload SDK
         run: |
@@ -35,12 +35,9 @@ jobs:
           make clean
           make
 
-      - name: Verify Segment Flags
+      - name: Verify ELF Headers and Libraries
         run: |
-          echo "=== Checking segment flags ==="
-          readelf -l FIROZ_OS.elf | grep -E "Type|Flags|LOAD"
-          echo ""
-          echo "=== Checking NEEDED libraries ==="
+          readelf -l FIROZ_OS.elf
           readelf -d FIROZ_OS.elf | grep NEEDED || true
 
       - name: Upload Build Artifact
