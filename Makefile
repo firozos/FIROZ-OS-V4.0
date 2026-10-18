@@ -1,5 +1,5 @@
 # ============================================================================
-# FIROZ OS v4.0 - Makefile (PS5 Jailbreak Payload Compiler)
+# FIROZ OS v4.0 - Ultimate Makefile for PS5 Payload (PIE Enabled)
 # ============================================================================
 
 PS5_PAYLOAD_SDK ?= /opt/ps5-payload-sdk
@@ -8,17 +8,16 @@ include $(PS5_PAYLOAD_SDK)/toolchain/prospero.mk
 TARGET := FIROZ_OS.elf
 SRCS   := main.c
 
-# بهینه‌سازی و هشدارها
-CFLAGS += -O2 -Wall -Wextra -Wno-unused-parameter
-
-# کتابخانه‌های مورد نیاز برای تردینگ و شبکه
-LDADD  += -lpthread
+# تنظیمات بهینه‌سازی و تولید کد مستقل از موقعیت (PIE) برای سازگاری با لودر PS5
+CFLAGS := -O2 -Wall -Wextra -Wno-unused-parameter -fPIC
+LDFLAGS := -Wl,-pie
+LDADD  := -lpthread
 
 all: $(TARGET)
 
 $(TARGET): $(SRCS)
-	@echo "[*] Compiling $(TARGET)..."
-	$(CC) $(CFLAGS) -o $@ $(SRCS) $(LDADD)
+	@echo "[*] Compiling $(TARGET) as PIE binary..."
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCS) $(LDADD)
 	@echo "[+] Build successful: $(TARGET)"
 
 clean:
