@@ -1,28 +1,14 @@
-# ============================================================================
-# FIROZ OS v4.0 - Ultimate Makefile for PS5 Payload (PIE Enabled)
-# ============================================================================
-
 PS5_PAYLOAD_SDK ?= /opt/ps5-payload-sdk
 include $(PS5_PAYLOAD_SDK)/toolchain/prospero.mk
 
-TARGET := FIROZ_OS.elf
-SRCS   := main.c
+ELF := firoz_os_v4.elf
+SRCS := main.c
+CFLAGS := -O2 -Wall
 
-# تنظیمات بهینه‌سازی و تولید کد مستقل از موقعیت (PIE) برای سازگاری با لودر PS5
-CFLAGS := -O2 -Wall -Wextra -Wno-unused-parameter -fPIC
-LDFLAGS := -Wl,-pie
-LDADD  := -lpthread
+all: $(ELF)
 
-all: $(TARGET)
-
-$(TARGET): $(SRCS)
-	@echo "[*] Compiling $(TARGET) as PIE binary..."
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(SRCS) $(LDADD)
-	@echo "[+] Build successful: $(TARGET)"
+$(ELF): $(SRCS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
-	@echo "[*] Cleaning build artifacts..."
-	rm -f $(TARGET)
-	@echo "[+] Clean complete"
-
-.PHONY: all clean
+	rm -f $(ELF)
