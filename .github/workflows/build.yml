@@ -1,4 +1,4 @@
-name: Build FIROZ OS v4.0 Ultimate
+name: Build FIROZ OS ELF
 
 on:
   push:
@@ -8,41 +8,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Build Dependencies
+      - name: Install Clang and Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang lld unzip wget make xxd binutils
+          sudo apt-get install -y clang lld make wget unzip
 
-      - name: Download and Setup PS5 Payload SDK
+      - name: Install PS5 Payload SDK
         run: |
           wget -q https://github.com/ps5-payload-dev/sdk/releases/latest/download/ps5-payload-sdk.zip
-          sudo rm -rf /opt/ps5-payload-sdk
-          sudo unzip -q -d /opt/ ps5-payload-sdk.zip
+          sudo unzip -q -d /opt ps5-payload-sdk.zip
+          rm ps5-payload-sdk.zip
 
-      - name: Ensure icon.h Exists
+      - name: Compile ELF Payload
         run: |
-          if [ ! -f "icon.h" ] && [ -f "icon0.png" ]; then
-            xxd -i icon0.png > icon.h
-          fi
-
-      - name: Compile Payload ELF
-        run: |
-          export PS5_PAYLOAD_SDK=/opt/ps5-payload-sdk
-          make clean
+          sed -i 's/^    /\t/' Makefile
           make
 
-      - name: Verify ELF Headers and Libraries
-        run: |
-          readelf -l FIROZ_OS.elf
-          readelf -d FIROZ_OS.elf | grep NEEDED || true
-
-      - name: Upload Build Artifact
+      - name: Upload Compiled ELF Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FIROZ_OS_Ultimate
-          path: FIROZ_OS.elf
-          if-no-files-found: error
+          name: firoz-os-v4-elf
+          path: firoz_os_v4.elf
